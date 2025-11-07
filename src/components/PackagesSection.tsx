@@ -14,99 +14,6 @@ import Link from "next/link";
 
 const PACKAGE_COLORS = ["#46ACFA", "#FF7A51", "#B8FC39"];
 
-// Fallback packages for development/testing or when API fails
-const FALLBACK_PACKAGES: Package[] = [
-  {
-    id: 1001,
-    name: "ELECTION STARTER",
-    price: 25000,
-    description:
-      "Perfect package for new candidates looking to make their mark in politics with professional campaign materials.",
-    items: [
-      { id: 1, name: "Campaign Strategy Kit", quantity: 1 },
-      { id: 2, name: "Social Media Templates", quantity: 15 },
-      { id: 3, name: "Poster Designs", quantity: 10 },
-    ],
-    features: [
-      "Professional Campaign Videos",
-      "Social Media Management",
-      "Custom Poster Designs",
-      "WhatsApp Campaign Templates",
-      "Email Marketing Setup",
-    ],
-    deliverables: [
-      "Campaign Strategy",
-      "Digital Assets",
-      "Training Materials",
-    ],
-    is_active: true,
-    is_popular: true,
-    popular_order: 1,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: 1002,
-    name: "VICTORY PRO",
-    price: 50000,
-    description:
-      "Comprehensive campaign solution for serious candidates ready to dominate their constituency with advanced tools.",
-    items: [
-      { id: 4, name: "Advanced Analytics Dashboard", quantity: 1 },
-      { id: 5, name: "Video Production Package", quantity: 5 },
-      { id: 6, name: "Billboard Designs", quantity: 20 },
-    ],
-    features: [
-      "Premium Video Production",
-      "Advanced Analytics & Insights",
-      "Billboard & Banner Designs",
-      "Dedicated Campaign Manager",
-      "Press Release Distribution",
-      "Influencer Outreach",
-      "Crisis Management Support",
-    ],
-    deliverables: [
-      "Full Campaign Strategy",
-      "Premium Digital Assets",
-      "Media Kit",
-    ],
-    is_active: true,
-    is_popular: true,
-    popular_order: 2,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: 1003,
-    name: "CHAMPION ELITE",
-    price: 100000,
-    description:
-      "The ultimate campaign package for leaders who demand excellence and want to leave nothing to chance.",
-    items: [
-      { id: 7, name: "Full Campaign Management", quantity: 1 },
-      { id: 8, name: "Professional Photo Shoots", quantity: 3 },
-      { id: 9, name: "TV Commercial Production", quantity: 2 },
-    ],
-    features: [
-      "Full-Service Campaign Management",
-      "TV & Radio Commercial Production",
-      "Professional Photography",
-      "Nationwide Media Coverage",
-      "Celebrity Endorsements",
-      "Ground Campaign Coordination",
-      "Real-time Polling & Research",
-      "VIP Support 24/7",
-    ],
-    deliverables: [
-      "Complete Campaign Execution",
-      "Premium Media Package",
-      "Research Reports",
-    ],
-    is_active: true,
-    is_popular: true,
-    popular_order: 3,
-    created_at: new Date().toISOString(),
-  },
-];
-
 const VERTICAL_LINE_CLASSES =
   "absolute top-0 h-full stroke-[2] text-gray-600 transition-colors group-hover:text-gray-400";
 
@@ -284,21 +191,11 @@ export function PackagesSection() {
     const fetchPackages = async () => {
       try {
         setLoading(true);
-        console.log("🔄 Fetching popular packages from API...");
         const data = await productService.getPopularPackages();
-        console.log("✅ Popular packages received:", data);
-
-        // Use API data if available, otherwise use fallback packages
-        if (data && data.length > 0) {
-          setPackages(data);
-        } else {
-          console.log("⚠️ No packages from API, using fallback packages");
-          setPackages(FALLBACK_PACKAGES);
-        }
+        setPackages(data || []);
       } catch (error) {
-        console.error("❌ Error fetching popular packages:", error);
-        console.log("🔄 Using fallback packages for development/testing");
-        setPackages(FALLBACK_PACKAGES);
+        console.error("Error fetching popular packages:", error);
+        setPackages([]);
       } finally {
         setLoading(false);
       }
@@ -329,6 +226,38 @@ export function PackagesSection() {
         {loading ? (
           <div className="flex justify-center items-center min-h-[400px]">
             <LoadingSpinner />
+          </div>
+        ) : packages.length === 0 ? (
+          <div className="text-center py-20">
+            <SlideIn>
+              <div className="mb-6">
+                <svg
+                  className="mx-auto w-24 h-24 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-700 mb-3">
+                No Packages Available
+              </h3>
+              <p className="text-lg text-gray-500 mb-8">
+                We&apos;re currently updating our packages. Check back soon for exciting new offerings!
+              </p>
+              <Link
+                href="/contact"
+                className="button-cutout inline-flex items-center justify-center bg-brand-purple text-white font-black text-lg px-8 py-4 uppercase tracking-wide transition-all duration-300 hover:scale-105"
+              >
+                Contact Us for Custom Solutions
+              </Link>
+            </SlideIn>
           </div>
         ) : (
           <>

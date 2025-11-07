@@ -15,86 +15,7 @@ import { Campaign } from "@/types/product";
 // Theme colors for campaigns
 type CampaignTheme = "Blue" | "Orange" | "Navy" | "Lime";
 
-// Fallback campaigns for development/testing or when API fails
-const FALLBACK_CAMPAIGNS: Campaign[] = [
-  {
-    id: 2001,
-    name: "Helicopter Campaign",
-    price: 150000,
-    unit: "per event",
-    description:
-      "Make a grand entrance and capture attention with our helicopter campaign service. Perfect for rallies, events, and creating unforgettable moments that voters will remember.",
-    features: [
-      "Professional helicopter rental with pilot",
-      "Aerial photography and videography",
-      "Safety equipment and insurance included",
-      "Ground coordination team",
-      "Social media content package",
-      "Event planning assistance",
-    ],
-    deliverables: [
-      "High-quality aerial footage",
-      "Professional photos",
-      "Social media ready content",
-    ],
-    is_active: true,
-    is_popular: true,
-    popular_order: 1,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: 2002,
-    name: "Wellness ATM Campaign",
-    price: 75000,
-    unit: "per month",
-    description:
-      "Connect with voters through health and wellness. Our Health ATM provides free health checkups, building trust and goodwill in your constituency while promoting ethical campaigning.",
-    features: [
-      "Mobile Health ATM unit",
-      "Basic health screening services",
-      "Trained medical staff",
-      "Data collection and analytics",
-      "Branded health cards for voters",
-      "Community outreach coordination",
-      "Monthly health reports",
-    ],
-    deliverables: [
-      "Health screening data",
-      "Voter engagement metrics",
-      "Campaign impact reports",
-    ],
-    is_active: true,
-    is_popular: true,
-    popular_order: 2,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: 2003,
-    name: "VR Experience Campaign",
-    price: 100000,
-    unit: "per event",
-    description:
-      "Showcase your vision with cutting-edge Virtual Reality technology. Let voters experience your development plans and promises in an immersive, memorable way that sets you apart.",
-    features: [
-      "VR headsets and equipment",
-      "Custom VR content creation",
-      "Interactive development showcases",
-      "Technical support team",
-      "Crowd management assistance",
-      "Social media integration",
-      "Post-event analytics",
-    ],
-    deliverables: [
-      "Custom VR experience",
-      "Event footage and photos",
-      "Engagement analytics report",
-    ],
-    is_active: true,
-    is_popular: true,
-    popular_order: 3,
-    created_at: new Date().toISOString(),
-  },
-];
+
 
 // Campaign image mapping - Fallback for campaigns without uploaded images
 const getCampaignImageFallback = (campaignName: string): string | undefined => {
@@ -236,21 +157,11 @@ export function CampaignsSection() {
     const fetchCampaigns = async () => {
       try {
         setLoading(true);
-        console.log("🔄 Fetching popular campaigns from API...");
         const data = await productService.getPopularCampaigns();
-        console.log("✅ Popular campaigns received:", data);
-        
-        // Use API data if available, otherwise use fallback campaigns
-        if (data && data.length > 0) {
-          setCampaigns(data);
-        } else {
-          console.log("⚠️ No campaigns from API, using fallback campaigns");
-          setCampaigns(FALLBACK_CAMPAIGNS);
-        }
+        setCampaigns(data || []);
       } catch (error) {
-        console.error("❌ Error fetching popular campaigns:", error);
-        console.log("🔄 Using fallback campaigns for development/testing");
-        setCampaigns(FALLBACK_CAMPAIGNS);
+        console.error("Error fetching popular campaigns:", error);
+        setCampaigns([]);
       } finally {
         setLoading(false);
       }
@@ -309,7 +220,9 @@ export function CampaignsSection() {
     <div>
       {/* Campaign Cards from API */}
       {loading ? (
-        <LoadingSpinner />
+        <div className="min-h-screen flex items-center justify-center bg-texture bg-brand-gray">
+          <LoadingSpinner />
+        </div>
       ) : campaignsWithTheme.length > 0 ? (
         <>
           {campaignsWithTheme.map((campaign, index) => (
@@ -324,9 +237,44 @@ export function CampaignsSection() {
           <CampaignCard campaign={outroSlide} index={campaignsWithTheme.length} isOutro={true} />
         </>
       ) : (
-        <div className="min-h-screen flex items-center justify-center bg-brand-gray">
-          <p className="text-lg">No campaigns available at the moment.</p>
-        </div>
+        <Bounded className="bg-texture bg-brand-gray text-black min-h-screen flex items-center justify-center">
+          <div className="text-center max-w-2xl mx-auto py-20">
+            <SlideIn>
+              <div className="mb-6">
+                <svg
+                  className="mx-auto w-24 h-24 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                  />
+                </svg>
+              </div>
+            </SlideIn>
+            <SlideIn>
+              <Heading as="h2" className="mb-6">
+                NO CAMPAIGNS AVAILABLE
+              </Heading>
+            </SlideIn>
+            <SlideIn>
+              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                We&apos;re currently preparing exciting new campaign options for you. Check back soon or contact us for custom campaign solutions!
+              </p>
+            </SlideIn>
+            <SlideIn>
+              <div className="flex justify-center">
+                <ButtonLink href="/contact" color="lime" size="lg">
+                  Contact Us
+                </ButtonLink>
+              </div>
+            </SlideIn>
+          </div>
+        </Bounded>
       )}
     </div>
   );
